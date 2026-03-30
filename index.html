@@ -1132,7 +1132,7 @@
         </div>
 
         <div class="marquee-container group cursor-hover">
-            <div id="index-reports-marquee" class="marquee-content flex gap-8 py-12 px-4 select-none">
+            <div id="index-reports-marquee" class="flex gap-8 py-12 px-4 select-none w-max">
                 <!-- Original Set -->
                 <div
                     class="flex-shrink-0 w-[450px] bg-neo-black border-4 border-white/10 p-8 shadow-hard hover:border-neo-green/50 hover:-translate-y-2 transition-all duration-500 relative group/card overflow-hidden text-left whitespace-normal">
@@ -1670,21 +1670,25 @@
                     </div>`;
                 });
 
+                // Wrap segment in a perfectly measurable container
+                let wrappedSegment = `<div class="live-feed-segment flex gap-8 shrink-0">${segment}</div>`;
+
                 // repeat segments; ensure at least 3 copies for wrap
-                marquee.innerHTML = segment + segment + segment;
+                marquee.innerHTML = wrappedSegment + wrappedSegment + wrappedSegment;
                 let repeats = 3;
                 const sliderWidth = reportsSlider ? reportsSlider.clientWidth : 0;
                 if (reportsMarquee && sliderWidth > 0) {
-                    while (reportsMarquee.scrollWidth < sliderWidth * 2 && repeats < 8) {
-                        marquee.innerHTML += segment;
+                    // Try to guess width initially, or just rely on DOM after insertion
+                    while (repeats < 6) { // Just ensure a safe amount of overflow
+                        marquee.innerHTML += wrappedSegment;
                         repeats += 1;
                     }
                     reportsMarquee.dataset.repeatCount = String(repeats);
                 }
-                // set starting offset to the first middle segment
-                if (reportsSlider && reportsMarquee) {
-                    const seg = repeats > 0 ? reportsMarquee.scrollWidth / repeats : 0;
-                    if (seg > 0) reportsSlider.scrollLeft = seg;
+                // set starting offset
+                if (reportsSlider && reportsMarquee.firstElementChild) {
+                    const segWidth = reportsMarquee.firstElementChild.offsetWidth + 32; // 32 is gap-8
+                    if (segWidth > 32) reportsSlider.scrollLeft = segWidth;
                 }
             } catch (error) {
                 console.error("Failed to load reports", error);
@@ -1700,15 +1704,24 @@
         let reportsStartX;
         let reportsScrollLeft;
         let reportsHoverTimer;
+        let isReportsAutoPaused = false;
 
-        const pauseReports = () => { if (reportsMarquee) reportsMarquee.style.animationPlayState = 'paused'; };
-        const resumeReports = () => { if (reportsMarquee) reportsMarquee.style.animationPlayState = 'running'; };
+        const pauseReports = () => { isReportsAutoPaused = true; };
+        const resumeReports = () => { isReportsAutoPaused = false; };
+
+        // Continuous seamless auto-scroll
+        function runReportsAutoScroll() {
+            if (reportsSlider && !reportsIsDown && !isReportsAutoPaused) {
+                reportsSlider.scrollLeft += 1;
+            }
+            requestAnimationFrame(runReportsAutoScroll);
+        }
+        runReportsAutoScroll();
 
         const resetReportsLoopPosition = () => {
-            if (!reportsSlider || !reportsMarquee) return;
-            const count = parseInt(reportsMarquee.dataset.repeatCount || '0', 10);
-            const seg = count > 0 ? reportsMarquee.scrollWidth / count : 0;
-            if (seg > 0) reportsSlider.scrollLeft = seg; // keep pointer in middle copy
+            if (!reportsSlider || !reportsMarquee || !reportsMarquee.firstElementChild) return;
+            const seg = reportsMarquee.firstElementChild.offsetWidth + 32;
+            if (seg > 32) reportsSlider.scrollLeft = seg; // keep pointer in middle copy
         };
 
         if (reportsSlider && reportsMarquee) {
@@ -1761,17 +1774,20 @@
 
             // seamless wrap so dragging feels circular
             reportsSlider.addEventListener('scroll', () => {
+                if (!reportsMarquee.firstElementChild) return;
                 const count = parseInt(reportsMarquee.dataset.repeatCount || '0', 10);
-                const seg = count > 0 ? reportsMarquee.scrollWidth / count : 0;
-                if (seg <= 0) return;
+                const seg = reportsMarquee.firstElementChild.offsetWidth + 32; // width of one segment including gap
+                if (seg <= 32 || count < 3) return;
+
                 const left = reportsSlider.scrollLeft;
                 const min = seg;                 // start of middle band
                 const max = seg * (count - 1);   // end of middle band
                 const span = seg * (count - 2);   // wrap distance
-                const buffer = 24;
-                if (left > max - buffer) {
+                
+                // When we scroll perfectly past the threshold, snap back exactly 1 span
+                if (left >= max) {
                     reportsSlider.scrollLeft = left - span;
-                } else if (left < min - buffer) {
+                } else if (left <= min - seg) { // if dragged backwards past first segment
                     reportsSlider.scrollLeft = left + span;
                 }
             });

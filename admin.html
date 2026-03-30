@@ -383,9 +383,7 @@
     .live-section { border-top: 4px solid var(--text-dark); border-bottom: 4px solid var(--text-dark); background: var(--bg-color); margin-top: 40px; }
     .live-header { padding: 20px; border-bottom: 4px solid var(--text-dark); display: flex; align-items: center; gap: 15px; }
     .live-marquee-wrapper { overflow: hidden; position: relative; white-space: nowrap; padding: 40px 0; background: var(--text-dark); }
-    .live-marquee-container { display: inline-flex; /* removed animation */ gap: 32px; padding: 0 16px; }
-    .live-marquee-wrapper:hover .live-marquee-container { animation-play-state: paused; }
-     100% { transform: translateX(calc(-50% - 16px)); } }
+    .live-marquee-container { display: inline-flex; gap: 32px; padding: 0 16px; }
     
     .live-card { flex-shrink: 0; width: 450px; background: #121212; border: 4px solid rgba(255,255,255,0.1); padding: 32px; box-shadow: 8px 8px 0 rgba(0,0,0,1); position: relative; transition: all 0.3s ease; white-space: normal; color: #fff; cursor: default; overflow: hidden; font-family: 'Space Grotesk', sans-serif;}
     .live-card:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-8px); }
@@ -598,11 +596,6 @@
       display: inline-flex;
       gap: 32px;
       padding: 0 16px;
-      animation: scroll-left-live 36s linear infinite;
-    }
-    @keyframes scroll-left-live {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
     }
 
     .live-index-card {
@@ -888,9 +881,18 @@
     let isDown = false;
     let startX;
     let scrollLeft;
+    let isMarqueeAutoPaused = false;
 
-    const pauseMarquee = () => { if (marquee) marquee.style.animationPlayState = 'paused'; };
-    const resumeMarquee = () => { if (marquee) marquee.style.animationPlayState = 'running'; };
+    const pauseMarquee = () => { isMarqueeAutoPaused = true; };
+    const resumeMarquee = () => { isMarqueeAutoPaused = false; };
+
+    function runAdminAutoScroll() {
+      if (slider && !isDown && !isMarqueeAutoPaused) {
+        slider.scrollLeft += 1;
+      }
+      requestAnimationFrame(runAdminAutoScroll);
+    }
+    runAdminAutoScroll();
 
     if (slider) {
       let hoverTimer;
@@ -939,18 +941,19 @@
 
       // seamless wrap so dragging feels circular
       slider.addEventListener('scroll', () => {
-        if (!marquee) return;
+        if (!marquee || !marquee.firstElementChild) return;
         const count = parseInt(marquee.dataset.repeatCount || '0', 10);
-        const seg = count > 0 ? marquee.scrollWidth / count : 0;
-        if (seg <= 0) return;
+        const seg = marquee.firstElementChild.offsetWidth + 32;
+        if (seg <= 32 || count < 3) return;
+
         const left = slider.scrollLeft;
         const min = seg;
         const max = seg * (count - 1);
         const span = seg * (count - 2);
-        const buffer = 24;
-        if (left > max - buffer) {
+
+        if (left >= max) {
           slider.scrollLeft = left - span;
-        } else if (left < min - buffer) {
+        } else if (left <= min - seg) {
           slider.scrollLeft = left + span;
         }
       });
@@ -1152,22 +1155,25 @@
         </div>`;
       });
 
+      // Wrap segment for perfect width measurements
+      let wrappedSegment = `<div class="live-feed-segment" style="display:inline-flex; gap:32px;">${segment}</div>`;
+
       // repeat segments; ensure ample width for wrap
-      container.innerHTML = segment + segment + segment;
+      container.innerHTML = wrappedSegment + wrappedSegment + wrappedSegment;
       let repeats = 3;
       const sliderWidth = slider ? slider.clientWidth : 0;
-      if (sliderWidth > 0) {
-        while (container.scrollWidth < sliderWidth * 3 && repeats < 12) {
-          container.innerHTML += segment;
+      if (sliderWidth > 0 && container.firstElementChild) {
+        while (repeats < 6) {
+          container.innerHTML += wrappedSegment;
           repeats += 1;
         }
       }
       container.dataset.repeatCount = String(repeats);
 
       // start at middle copy for bidirectional drag
-      if (slider && repeats > 0) {
-        const seg = container.scrollWidth / repeats;
-        if (seg > 0) {
+      if (slider && container.firstElementChild) {
+        const seg = container.firstElementChild.offsetWidth + 32; // width of group + gap
+        if (seg > 32) {
           const midIndex = Math.floor(repeats / 2);
           slider.scrollLeft = seg * midIndex;
         }
