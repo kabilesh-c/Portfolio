@@ -1,0 +1,1268 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission Control | Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Space+Grotesk:wght@600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #FFFDF5;
+      --text-dark: #121212;
+      --border-dark: #121212;
+      --card-bg: #1A1A1A;
+      --accent-yellow: #FBFF48;
+      --accent-green: #33FF57;
+      --accent-red: #FF2A2A;
+      --accent-blue: #3B82F6;
+      --accent-pink: #FF70A6;
+      --accent-cyan: #00E5FF;
+      --shadow-offset: 6px;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image: radial-gradient(var(--text-dark) 1px, transparent 1px);
+      background-size: 30px 30px;
+      font-family: 'Space Grotesk', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      box-sizing: border-box;
+      color: var(--text-dark);
+    }
+
+        /* NEO-BRUTALIST ARCADE LOGIN SCREEN */
+        /* MARQUEE WARNING BANNERS */
+    .marquee-container {
+      position: fixed;
+      width: 100vw;
+      left: 0;
+      background: var(--accent-yellow);
+      color: var(--text-dark);
+      border-top: 4px solid var(--text-dark);
+      border-bottom: 4px solid var(--text-dark);
+      padding: 12px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      z-index: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+    }
+    .marquee-top {
+      top: 40px;
+      box-shadow: 0 8px 0 var(--text-dark);
+      transform: rotate(-2deg) scale(1.05);
+    }
+    .marquee-bottom {
+      bottom: 40px;
+      background: var(--text-dark);
+      color: var(--accent-pink);
+      border-top: 4px solid var(--accent-pink);
+      border-bottom: 4px solid var(--accent-pink);
+      box-shadow: 0 -8px 0 var(--text-dark);
+      transform: rotate(2deg) scale(1.05);
+    }
+    .marquee-content {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scroll 15s linear infinite;
+    }
+    .marquee-container:hover .marquee-content {
+      animation-play-state: paused;
+    }
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .login-wrapper {
+      background: var(--accent-yellow);
+      border: 6px solid var(--border-dark);
+      border-radius: 0; /* Brutalist = sharp */
+      box-shadow: 16px 16px 0 var(--text-dark);
+      padding: 48px 32px 32px 32px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      margin: auto;
+      font-family: 'Press Start 2P', monospace;
+      transition: opacity 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+    .arcade-title {
+      font-size: 2.1rem;
+      color: var(--text-dark);
+      text-shadow: 4px 4px 0 #fff, 8px 8px 0 var(--accent-cyan);
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+    .arcade-desc {
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      background: #fff;
+      border: 3px solid var(--border-dark);
+      display: inline-block;
+      padding: 10px 16px;
+      margin-bottom: 36px;
+      line-height: 1.6;
+      box-shadow: 4px 4px 0 var(--accent-cyan);
+    }
+    .btn-login {
+      background: var(--text-dark);
+      color: var(--accent-green);
+      border: 4px solid var(--text-dark);
+      font-family: inherit;
+      font-size: 1.1rem;
+      padding: 18px 36px;
+      cursor: pointer;
+      box-shadow: 6px 6px 0 var(--border-dark);
+      transition: transform 0.1s, box-shadow 0.1s;
+      margin-bottom: 24px;
+      width: 100%;
+      text-transform: uppercase;
+    }
+    .btn-login:hover {
+      background: var(--accent-cyan);
+      color: var(--text-dark);
+    }
+    .btn-login:active {
+      transform: translate(6px, 6px);
+      box-shadow: 0 0 0 var(--border-dark);
+    }
+    .insert-coin {
+      color: var(--text-dark);
+      font-size: 1.2rem;
+      animation: blink 1s steps(2, start) infinite;
+      text-shadow: 2px 2px 0 #fff;
+    }
+    @keyframes blink {
+      to { visibility: hidden; }
+    }
+
+    /* Unauthorized State (Brutalist) */
+    .not-for-you {
+      display: none;
+      background: var(--accent-red);
+      color: var(--text-dark);
+      border: 8px solid var(--border-dark);
+      box-shadow: 16px 16px 0 var(--border-dark);
+      padding: 60px 40px;
+      text-align: center;
+      font-family: 'Press Start 2P', monospace;
+      flex-direction: column;
+      align-items: center;
+      margin: auto;
+      z-index: 2;
+    }
+    .not-for-you h2 {
+      font-size: 2.5rem;
+      margin: 10px 0;
+      text-shadow: 4px 4px 0 #fff;
+      text-transform: uppercase;
+    }
+    .not-for-you p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--text-dark);
+      background: #fff;
+      padding: 8px 16px;
+      border: 3px solid var(--text-dark);
+      transform: rotate(-2deg);
+      margin-top: 20px;
+    }
+    .fun-emoji {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      display: inline-block;
+      animation: jump 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes jump {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-20px); }
+    }
+
+    /* DASHBOARD SCREEN */
+    .dashboard-wrapper {
+      display: none;
+      width: 100%;
+      max-width: 1400px;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .top-nav {
+      background: var(--text-dark);
+      color: #fff;
+      border: 4px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 24px 32px;
+      box-shadow: 8px 8px 0 var(--border-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-title h2 {
+      margin: 0;
+      font-size: 2.2rem;
+      color: var(--accent-yellow);
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    .nav-title p {
+      margin: 4px 0 0 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .btn-logout {
+      background: var(--accent-red);
+      color: #fff;
+      border: 3px solid var(--accent-red);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--bg-color);
+      transition: all 0.2s ease;
+    }
+    .btn-logout:hover {
+      background: transparent;
+      color: var(--accent-red);
+    }
+
+    /* REPORTS GRID */
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 32px;
+    }
+
+    /* CARD DESIGN */
+    .report-card {
+      background: var(--card-bg);
+      border: 4px solid var(--border-dark);
+      border-radius: 8px;
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-dark);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+    }
+    
+    .card-top-line {
+      height: 6px;
+      width: 100%;
+      border-bottom: 2px solid var(--border-dark);
+    }
+
+    .card-inner {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: 100%;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed #444;
+      padding-bottom: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .file-name { color: var(--accent-green); }
+    .file-size { color: #666; }
+
+    .card-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #aaa;
+      line-height: 1.6;
+    }
+    .meta-highlight {
+      color: #fff;
+      font-weight: 700;
+    }
+    .meta-label {
+      color: #666;
+    }
+
+    .card-message {
+      font-size: 1.25rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #fff;
+      margin: 8px 0;
+      flex-grow: 1;
+    }
+
+    .card-rating {
+      color: var(--accent-pink);
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+    }
+
+    /* CARD ACTIONS */
+    .card-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px dashed #444;
+    }
+    .btn-action {
+      flex: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 1rem;
+      border: 3px solid var(--border-dark);
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+    }
+    .btn-approve {
+      background: var(--accent-green);
+      color: var(--text-dark);
+      box-shadow: 3px 3px 0 var(--border-dark);
+    }
+    .btn-approve:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 var(--border-dark);
+    }
+
+    .btn-reject {
+      background: transparent;
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+      box-shadow: 3px 3px 0 var(--accent-red);
+    }
+    .btn-reject:hover {
+      background: var(--accent-red);
+      color: #fff;
+      box-shadow: 3px 3px 0 var(--border-dark);
+      border-color: var(--border-dark);
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px;
+      background: var(--text-dark);
+      color: #fff;
+      border: 4px solid var(--border-dark);
+      border-radius: 12px;
+      box-shadow: 8px 8px 0 var(--border-dark);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .empty-state h3 {
+      color: var(--accent-cyan);
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    /* NEW LIVE FEED STYLES */
+    .live-section { border-top: 4px solid var(--text-dark); border-bottom: 4px solid var(--text-dark); background: var(--bg-color); margin-top: 40px; }
+    .live-header { padding: 20px; border-bottom: 4px solid var(--text-dark); display: flex; align-items: center; gap: 15px; }
+    .live-marquee-wrapper { overflow: hidden; position: relative; white-space: nowrap; padding: 40px 0; background: var(--text-dark); }
+    .live-marquee-container { display: inline-flex; /* removed animation */ gap: 32px; padding: 0 16px; }
+    .live-marquee-wrapper:hover .live-marquee-container { animation-play-state: paused; }
+     100% { transform: translateX(calc(-50% - 16px)); } }
+    
+    .live-card { flex-shrink: 0; width: 450px; background: #121212; border: 4px solid rgba(255,255,255,0.1); padding: 32px; box-shadow: 8px 8px 0 rgba(0,0,0,1); position: relative; transition: all 0.3s ease; white-space: normal; color: #fff; cursor: default; overflow: hidden; font-family: 'Space Grotesk', sans-serif;}
+    .live-card:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-8px); }
+    .live-card .top-accent { position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+    .live-card .corner-accent { position: absolute; top: -16px; right: -16px; width: 48px; height: 48px; background: rgba(255,255,255,0.05); transform: rotate(45deg); }
+    
+    .btn-cancel { position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%); background: var(--accent-red); color: white; border: 2px solid white; font-family: 'JetBrains Mono', monospace; font-weight: bold; padding: 8px 16px; cursor: pointer; transition: all 0.3s ease; opacity: 0; z-index: 10; box-shadow: 4px 4px 0 black; }
+    .btn-cancel:hover { background: white; color: var(--accent-red); border-color: var(--accent-red); }
+    .live-card:hover .btn-cancel { bottom: 20px; opacity: 1; }
+
+    /* PAGINATION */
+    .pagination-controls { display: flex; justify-content: center; gap: 8px; margin-top: 32px; padding-bottom: 20px; }
+    .page-btn { background: white; color: black; border: 2px solid black; font-family: 'JetBrains Mono', monospace; font-weight: bold; padding: 8px 16px; cursor: pointer; box-shadow: 2px 2px 0 black; transition: all 0.2s; }
+    .page-btn:hover, .page-btn.active { background: black; color: white; box-shadow: 0px 0px 0 black; transform: translate(2px, 2px); }
+
+    .section-title { font-size: 1.8rem; margin: 50px 0 20px 0; color: var(--text-dark); text-transform: uppercase; font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; gap:10px; }
+  
+    .terminal-header-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 30px;
+        padding: 16px;
+        background: #1A1A1A;
+        border: 2px solid var(--border-dark);
+        box-shadow: 4px 4px 0 var(--accent-blue);
+        color: white;
+    }
+    .terminal-header-box .dots-wrapper {
+        display: flex;
+        gap: 8px;
+        margin-right: 8px;
+    }
+    .terminal-header-box .dot {
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        border: 1px solid var(--border-dark);
+    }
+    .dot-red { background: var(--accent-pink); }
+    .dot-yellow { background: var(--accent-yellow); }
+    .dot-green { background: var(--accent-green); }
+    .terminal-header-box h2 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 20px;
+        font-weight: bold;
+        letter-spacing: -0.05em;
+        margin: 0;
+        color: white;
+        text-transform: uppercase;
+    }
+    .terminal-header-box .badge {
+        margin-left: 32px;
+        padding: 2px 8px;
+        background: var(--accent-blue);
+        color: black;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        border: 1px solid black;
+    }
+    .live-section { border: none; background: transparent; margin-top: 40px; margin-bottom:40px; }
+    .live-header { padding: 0; border: none; display: block; }
+
+
+.live-index-card {
+    flex-shrink: 0;
+    width: 450px;
+    background-color: #1A1A1A;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    box-shadow: 4px 4px 0 var(--border-dark);
+    transition: all 0.5s;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    white-space: normal;
+    font-family: inherit;
+    color: white;
+}
+.live-index-card:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-8px);
+}
+.live-index-card .top-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+}
+.live-index-card .corner-box {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.05);
+    transform: rotate(45deg);
+}
+.live-index-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+.live-index-card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+.live-index-card-year {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #6b7280;
+}
+.live-index-card-from {
+    font-family: 'JetBrains Mono', monospace;
+    color: #9ca3af;
+    font-size: 10px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: -0.025em;
+}
+.live-index-card-msg {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.375;
+    margin-bottom: 24px;
+    color: rgba(255, 255, 255, 0.9);
+}
+.live-index-card-stars {
+    display: flex;
+    gap: 4px;
+    font-size: 18px;
+}
+.live-index-btn {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 2px solid var(--accent-pink);
+    color: var(--accent-pink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.2s;
+}
+.live-index-btn:hover {
+    background: var(--accent-pink);
+    color: black;
+}
+
+
+    .section-top-nav {
+      background: var(--card-bg);
+      color: #fff;
+      border: 4px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .section-top-nav .nav-title h2 {
+      margin: 0;
+      font-size: 2.2rem;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    .section-top-nav .nav-title p {
+      margin: 4px 0 0 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .live-section {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      background: var(--text-dark);
+      padding: 60px 0;
+      position: relative;
+      border-top: 4px solid var(--border-dark);
+      border-bottom: 4px solid var(--border-dark);
+    }
+    .live-marquee-wrapper {
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding: 40px 20px;
+      cursor: grab;
+      touch-action: pan-x;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none; /* Firefox */
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: auto;
+    }
+    .live-marquee-wrapper::-webkit-scrollbar {
+      display: none; /* Safari and Chrome */
+    }
+    .live-marquee-wrapper:active {
+      cursor: grabbing;
+    }
+    .live-marquee-container {
+      display: inline-flex;
+      gap: 32px;
+      padding: 0 16px;
+      animation: scroll-left-live 26s linear infinite;
+    }
+    .live-marquee-wrapper:hover .live-marquee-container { animation-play-state: paused; }
+
+    @keyframes scroll-left-live {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .live-index-card {
+      /* increase bottom padding to leave space for button drawer */
+      padding-bottom: 80px; 
+    }
+    .revoke-btn-wrapper {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      background: linear-gradient(transparent, rgba(26,26,26,1) 30%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .live-index-card:hover .revoke-btn-wrapper {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .live-index-btn { margin: 0; background: var(--card-bg); width: 100%; }
+
+    /* Scroll reveal */
+    .reveal-on-scroll { opacity: 0; transform: translateY(24px); transition: all 0.6s ease; }
+    .reveal-on-scroll.visible { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+  <!-- CAUTION TAPES (PRE-LOGIN WARNING) -->
+  <div class="marquee-container marquee-top">
+    <div class="marquee-content">
+        🚫 NAH, DAWG. THIS ISN'T FOR YOU. 🚫 EXTREMELY RESTRICTED 🚫 NAH, DAWG. THIS ISN'T FOR YOU. 🚫 EXTREMELY RESTRICTED 🚫 NAH, DAWG. THIS ISN'T FOR YOU. 🚫 EXTREMELY RESTRICTED 🚫 NAH, DAWG. THIS ISN'T FOR YOU. 🚫 EXTREMELY RESTRICTED
+    </div>
+  </div>
+
+  <div class="marquee-container marquee-bottom">
+    <div class="marquee-content">
+      HOW DID YOU EVEN FIND THIS URL? 😮 I MEAN... TRY TO LOGIN I GUESS 😜🤷‍♂️ HOW DID YOU EVEN FIND THIS URL? 😮 I MEAN... TRY TO LOGIN I GUESS 😜🤷‍♂️ HOW DID YOU EVEN FIND THIS URL? 😮 I MEAN... TRY TO LOGIN I GUESS 😜🤷‍♂️
+    </div>
+  </div>
+
+  <!-- UNAUTHORIZED SCREEN -->
+  <div class="not-for-you" id="not-for-you">
+    <div class="fun-emoji">👾🚫</div>
+    <h2>GAME OVER!</h2>
+    <p>Not your level, outsider.</p>
+    <button class="btn-logout" id="btn-logout-reject" style="margin-top:20px;">BACK TO MENU</button>
+  </div>
+
+  <!-- LOGIN WRAPPER (ARCADE) -->
+  <div class="login-wrapper" id="login-wrapper">
+    <div class="arcade-title">Kabi Admin<br>Arcade</div>
+    <div class="arcade-desc">Insert coin to play admin mode!</div>
+    <button class="btn-login" id="btn-login-start">Start (Login)</button>
+    <div class="insert-coin">INSERT COIN</div>
+  </div>
+
+  <!-- DASHBOARD WRAPPER -->
+  <div class="dashboard-wrapper" id="dashboard-wrapper">
+    <div class="dashboard-inner" style="max-width: 1400px; margin: 0 auto; width: 100%; flex-direction: column; gap: 40px;">
+
+      <div class="section-top-nav reveal-on-scroll" style="border-radius: 12px; margin-bottom: 20px;">
+        <div class="nav-title">
+          <h2 style="color: var(--accent-yellow);">MISSION CONTROL</h2>
+          <p style="text-transform:none;">Live Feed :: Pending 'Let's Talk Code' Submissions</p>
+        </div>
+        <button class="btn-logout" id="btn-logout-dashboard">TERMINATE_SESSION</button>
+      </div>
+
+      <!-- 1. LATEST PENDING -->
+      <div class="section-top-nav reveal-on-scroll" style="box-shadow: 6px 6px 0 var(--accent-yellow);">
+        <div class="nav-title">
+          <h2 style="color: var(--accent-yellow);">PENDING LOGS</h2>
+          <p style="text-transform:none;">Awaiting Admin Approval :: Action Required</p>
+        </div>
+      </div>
+      <div class="reports-grid reveal-on-scroll" id="pending-grid">
+        <!-- Pending reviews filled here -->
+      </div>
+
+      <!-- 2. LIVE FEED Marquee -->
+      <div class="live-section">
+        <div class="live-header reveal-on-scroll" style="max-width: 1400px; margin: 0 auto; padding: 0;">
+          <div class="section-top-nav" style="box-shadow: 6px 6px 0 var(--accent-green);">
+            <div class="nav-title">
+              <h2 style="color: var(--accent-green);">LIVE REPORTS</h2>
+              <p style="text-transform:none;">Currently Streamed to the Portfolio Front-End</p>
+            </div>
+          </div>
+        </div>
+        <div class="live-marquee-wrapper reveal-on-scroll">
+          <div class="live-marquee-container" id="live-marquee-container">
+            <!-- Live logs here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. DICTIONARY -->
+      <div class="section-top-nav reveal-on-scroll" style="box-shadow: 6px 6px 0 var(--accent-blue);">
+        <div class="nav-title">
+          <h2 style="color: var(--accent-blue);">GLOBAL DICTIONARY</h2>
+          <p style="text-transform:none;">Complete Archive :: Database Records</p>
+        </div>
+      </div>
+      <div class="reports-grid reveal-on-scroll" id="dictionary-grid">
+        <!-- All reviews here -->
+      </div>
+
+      <div class="pagination-controls reveal-on-scroll" id="pagination-controls">
+        <!-- Pagination buttons -->
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    // --- 1. FIREBASE SETUP & IMPORTS ---
+    // Make sure we use ES module versions via CDN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, Timestamp, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBcRsHTVfCPjpd8wNzJEMMUsDh45Sy6-1A",
+      authDomain: "kabi-s-portfolio.firebaseapp.com",
+      projectId: "kabi-s-portfolio",
+      storageBucket: "kabi-s-portfolio.firebasestorage.app",
+      messagingSenderId: "812573384894",
+      appId: "1:812573384894:web:d5e8b2a40a406a4f85feef",
+      measurementId: "G-5ZPFL44JK1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const db = getFirestore(app);
+
+    // --- 2. LOGIC LAYER (UID CHECK) ---
+    // IMPORTANT: Temporarily keeping YOUR_UID_GOES_HERE strings so you can log in without it failing,
+    // until you replace this with your real UID from Firebase Authentication.
+    const ADMIN_UID = "suNRg8MJnye50aEVUXdXLSauF7D2"; // kabileshc.dev@gmail.com 
+
+    let pendingReviews = [];
+
+    // No local fallback; live feed uses Firestore only
+    const baseLiveData = [];
+
+    // Seed set to replace DB when invoked manually (admin-only)
+    const seedReports = [
+      {
+        name: "Laksh Baweja",
+        role: "CEO",
+        organization: "LakshDigital.in",
+        message: "Led an ML delivery that hit production SLAs, tied models to business KPIs, and shipped on schedule with clean handoffs.",
+        rating: 5,
+        relationship: "Client",
+        status: "approved",
+        sourceId: "seed-001"
+      },
+      {
+        name: "Jaideep Veeramani",
+        role: "Founder",
+        organization: "Ordinal Labs",
+        message: "Took a full stack concept to production quickly, stabilized the stack, and kept experiment cycles fast without breaking uptime.",
+        rating: 5,
+        relationship: "Founder/Client",
+        status: "approved",
+        sourceId: "seed-002"
+      },
+      {
+        name: "Garvit Singh Rathore",
+        role: "Intern",
+        organization: "FOSSEE",
+        message: "Refactored legacy ML scripts into modular packages, added unit tests, and fixed CI so pipelines passed consistently.",
+        rating: 4,
+        relationship: "Intern/Teammate",
+        status: "approved",
+        sourceId: "seed-003"
+      },
+      {
+        name: "Krish D Shah",
+        role: "Student",
+        organization: "IIT Madras BS",
+        message: "Demonstrated end to end ML pipelines with clear prototypes, explaining data prep, model training, and deployment steps to the cohort.",
+        rating: 5,
+        relationship: "Academic/Peer",
+        status: "approved",
+        sourceId: "seed-004"
+      },
+      {
+        name: "Navin Muthu",
+        role: "DevOps",
+        organization: "SMOAD Networks",
+        message: "Collaborated on releases, optimized CI/CD for full stack services, and kept infra reliable while improving deploy speed.",
+        rating: 5,
+        relationship: "Teammate",
+        status: "approved",
+        sourceId: "seed-005"
+      },
+      {
+        name: "Hari Nithish",
+        role: "Student",
+        organization: "VIT",
+        message: "Guided a full stack team, set sprint goals, unblocked integration issues, and delivered a polished build on time.",
+        rating: 4,
+        relationship: "Academic/Team Lead",
+        status: "approved",
+        sourceId: "seed-006"
+      },
+      {
+        name: "Tamilarasu K",
+        role: "Student",
+        organization: "Anna University",
+        message: "Executed fast with solid documentation, cleaned up APIs, and maintained regression free merges through focused code reviews.",
+        rating: 5,
+        relationship: "Academic/Peer",
+        status: "approved",
+        sourceId: "seed-007"
+      },
+      {
+        name: "Yadhisresht",
+        role: "Co-founder",
+        organization: "FORESIGHT-X",
+        message: "Shaped product roadmap, validated ML assumptions quickly, and shipped dependable releases while mentoring the full stack team.",
+        rating: 5,
+        relationship: "Co-founder/Partner",
+        status: "approved",
+        sourceId: "seed-008"
+      }
+    ];
+
+    // UI ELEMENTS
+    const loginWrapper = document.getElementById('login-wrapper');
+    const notForYou = document.getElementById('not-for-you');
+    const dashboardWrapper = document.getElementById('dashboard-wrapper');
+
+    // --- 3. AUTHENTICATION LISTENER ---
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("Logged in user UID:", user.uid); // <--- You will see your real UID here in console!
+        
+        // CHECK IF IT'S YOU!
+        if (user.uid === ADMIN_UID) {
+          loginWrapper.style.display = 'none';
+          notForYou.style.display = 'none';
+                      dashboardWrapper.style.display = 'flex';
+            const marquees = document.querySelectorAll('.marquee-container, .marquee-top, .marquee-bottom');
+            for(let i=0; i<marquees.length; i++) {
+                marquees[i].style.display = 'none';
+                marquees[i].style.visibility = 'hidden';
+                marquees[i].style.opacity = '0';
+                marquees[i].remove(); // just nuke them from the DOM to be 1000% sure
+            }
+          fetchReports();
+        } else {
+          loginWrapper.style.display = 'none';
+          dashboardWrapper.style.display = 'none';
+          notForYou.style.display = 'flex';
+        }
+      } else {
+        loginWrapper.style.display = 'block';
+          document.querySelectorAll('.marquee-container').forEach(el=>el.style.display='flex');
+        dashboardWrapper.style.display = 'none';
+        notForYou.style.display = 'none';
+      }
+    });
+
+    // Drag + wheel scroll for live marquee and pause/resume auto animation
+    const slider = document.querySelector('.live-marquee-wrapper');
+    const marquee = document.querySelector('.live-marquee-container');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    const pauseMarquee = () => { if (marquee) marquee.style.animationPlayState = 'paused'; };
+    const resumeMarquee = () => { if (marquee) marquee.style.animationPlayState = 'running'; };
+
+    if (slider) {
+      slider.addEventListener('mouseenter', pauseMarquee);
+      slider.addEventListener('mouseleave', resumeMarquee);
+      slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        slider.style.cursor = 'grabbing';
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+        pauseMarquee();
+      });
+      slider.addEventListener('mouseleave', () => {
+        isDown = false;
+        slider.style.cursor = 'grab';
+        resumeMarquee();
+      });
+      slider.addEventListener('mouseup', () => {
+        isDown = false;
+        slider.style.cursor = 'grab';
+        resumeMarquee();
+      });
+      slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 2;
+        slider.scrollLeft = scrollLeft - walk;
+      });
+      slider.addEventListener('wheel', (e) => {
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (delta !== 0) {
+          e.preventDefault();
+          slider.scrollLeft += delta;
+          pauseMarquee();
+          clearTimeout(slider.__wheelTimer);
+          slider.__wheelTimer = setTimeout(resumeMarquee, 350);
+        }
+      }, { passive: false });
+
+      // seamless wrap so dragging feels circular
+      slider.addEventListener('scroll', () => {
+        if (!marquee) return;
+        const count = parseInt(marquee.dataset.repeatCount || '0', 10);
+        const seg = count > 0 ? marquee.scrollWidth / count : 0;
+        if (seg <= 0) return;
+        const left = slider.scrollLeft;
+        const min = seg;
+        const max = seg * (count - 1);
+        const span = seg * (count - 2);
+        const buffer = 24;
+        if (left > max - buffer) {
+          slider.scrollLeft = left - span;
+        } else if (left < min - buffer) {
+          slider.scrollLeft = left + span;
+        }
+      });
+
+      // start near middle copy for smoother bidirectional drag
+      setTimeout(() => {
+        const count = parseInt(marquee?.dataset.repeatCount || '0', 10);
+        const seg = count > 0 ? marquee.scrollWidth / count : 0;
+        if (seg > 0) {
+          const midIndex = Math.floor(count / 2);
+          slider.scrollLeft = seg * midIndex;
+        }
+      }, 120);
+    }
+
+    // Scroll reveal animations
+    const revealEls = document.querySelectorAll('.reveal-on-scroll');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+
+    // --- 4. EXPOSE BINDINGS ---
+    document.getElementById('btn-login-start').addEventListener('click', () => {
+      signInWithPopup(auth, provider).catch(e => alert(e.message));
+    });
+
+    document.getElementById('btn-logout-dashboard').addEventListener('click', () => signOut(auth));
+    document.getElementById('btn-logout-reject').addEventListener('click', () => signOut(auth));
+
+    // --- 5. FIRESTORE LOGIC ---
+    let allReports = [];
+    let currentPage = 1;
+    const itemsPerPage = 9;
+    const colors = ["#33FF57", "#3B82F6", "#FF70A6", "#FBFF48"];
+
+    async function fetchReports() {
+      try {
+        const q = query(collection(db, "reports"));
+        const snapshot = await getDocs(q);
+        allReports = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            allReports.push({ 
+                id: doc.id, 
+                ...data, 
+                time: data.createdAt ? data.createdAt.toMillis() : Date.now() 
+            });
+        });
+        
+        allReports.sort((a,b) => b.time - a.time);
+        renderDashboards();
+      } catch (error) {
+        console.error("Firestore Error:", error);
+        allReports = [];
+        renderDashboards();
+      }
+    }
+
+    // Admin-only helper: replace all reports in Firestore with seedReports
+    async function replaceReportsWithSeed() {
+      try {
+        const colRef = collection(db, "reports");
+        const snap = await getDocs(colRef);
+        // delete existing
+        await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+        // insert seeds
+        for (const r of seedReports) {
+          await addDoc(colRef, { ...r, createdAt: Timestamp.now() });
+        }
+        await fetchReports();
+        alert("Seeded reports and cleared previous entries.");
+      } catch (error) {
+        console.error("Seeding failed", error);
+        alert("Seeding failed: check Firestore permissions.");
+      }
+    }
+
+    function renderDashboards() {
+        renderPending();
+        renderLiveFeed();
+        renderDictionary();
+    }
+
+    function createCardHTML(report, index, mode) {
+        let stars = "★".repeat(report.rating || 5) + "☆".repeat(5 - (report.rating || 5));
+        let c = report.color || colors[index % colors.length];
+        let linkHtml = report.proofLink ? `<span class="meta-label">PROXY:</span> <a href="${report.proofLink}" target="_blank" style="color:var(--accent-cyan);">${report.proofLink.substring(0,20)}... ↗</a><br>` : '';
+        let relationHtml = report.relationship ? `<span class="meta-label">RELATION:</span> ${report.relationship}<br>` : '';
+        let orgHtml = report.organization ? `<span class="meta-highlight">${(report.role||"USER").toUpperCase()} @ ${report.organization.toUpperCase()}</span><br>` : '';
+        
+        if (mode === 'live') {
+            return `
+            <div class="live-card" id="card-${report.id}" style="border-color:${c}">
+                <div class="top-accent" style="background:${c}"></div>
+                <div class="corner-accent"></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
+                    <div style="font-family:'JetBrains Mono', monospace; font-weight:700; color:${c}">REPORT_${report.id.substring(0,6)}.log</div>
+                </div>
+                <div style="font-family:'JetBrains Mono', monospace; font-size:0.75rem; color:#aaa; margin-bottom:8px; text-transform:uppercase;">
+                    FROM: ${report.role||"USER"} @ ${report.organization||"UNKNOWN"}
+                </div>
+                <p style="font-size:1.2rem; font-weight:700; margin-bottom:24px; line-height:1.4;">"${report.message}"</p>
+                <div style="color:${c}; opacity:0.8; font-size:1.2rem;">${stars}</div>
+                <button class="btn-cancel" onclick="handleAction('${report.id}', 'reject')">REVOKE LIVE STATUS x</button>
+            </div>
+            `;
+        }
+
+        let actions = '';
+        if (report.status === 'pending') {
+            actions = `
+              <button class="btn-action btn-approve" onclick="handleAction('${report.id}', 'approve')">APPROVE</button>
+              <button class="btn-action btn-reject" onclick="handleAction('${report.id}', 'reject')">REJECT</button>
+            `;
+        } else if (report.status === 'approved') {
+            actions = `
+              <button class="btn-action btn-reject" style="width:100%; background:var(--accent-red); color:white;" onclick="handleAction('${report.id}', 'reject')">REVOKE APPROVAL (UN-TICK)</button>
+            `;
+        } else {
+            actions = `
+              <button class="btn-action btn-approve" style="width:100%; background:var(--accent-green);" onclick="handleAction('${report.id}', 'approve')">RE-APPROVE (TICK)</button>
+            `;
+        }
+
+        return `
+          <div class="report-card" id="card-${report.id}">
+            <div class="card-top-line" style="border-color: ${c}"></div>
+            <div class="card-inner">
+              <div class="card-header">
+                <span class="file-name" style="color: ${c}">REPORT_${report.id.substring(0,6)}.LOG</span>
+                <span class="file-size" style="color: ${report.status === 'approved' ? 'var(--accent-green)' : report.status === 'rejected' ? 'var(--accent-red)' : '#666'}">[${report.status.toUpperCase()}]</span>
+              </div>
+              <div class="card-meta">
+                ${orgHtml ? `<span class="meta-label">FROM:</span> ${orgHtml}` : ''}
+                <span class="meta-label">NAME:</span> <span class="meta-highlight">${report.name||"Anonymous"}</span><br>
+                ${relationHtml}${linkHtml}
+              </div>
+              <div class="card-message">"${report.message}"</div>
+              <div class="card-rating" style="color: ${c}">${stars}</div>
+              <div class="card-actions">
+                ${actions}
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    function renderPending() {
+      const grid = document.getElementById('pending-grid');
+      const pending = allReports.filter(r => r.status === 'pending').slice(0, 6);
+      
+      grid.innerHTML = '';
+      if (pending.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><h3>&#x2714; ALL CLEAR</h3><p>NO NEW PENDING LOGS.</p></div>`;
+        return;
+      }
+      
+      pending.forEach((report, i) => {
+        grid.innerHTML += createCardHTML(report, i, 'standard');
+      });
+    }
+
+    function renderLiveFeed() {
+      const container = document.getElementById('live-marquee-container');
+      if (!container) return;
+      const existingSourceIds = new Set(allReports.map(r => r.sourceId).filter(Boolean));
+      const dbApproved = allReports.filter(r => r.status === 'approved');
+      const liveData = baseLiveData.filter(item => !existingSourceIds.has(item.id)).concat(dbApproved);
+
+      let segment = '';
+      const colorVars = ['var(--accent-green)', 'var(--accent-blue)', 'var(--accent-pink)', 'var(--accent-yellow)', 'var(--accent-orange)', '#a855f7'];
+
+      liveData.forEach((report, index) => {
+        const cVar = colorVars[index % colorVars.length];
+        const stars = '★'.repeat(report.rating || 5);
+        const dispId = report.id.length > 10 ? report.id.substring(0,6) : report.id;
+        const revokeBtn = `<div class="revoke-btn-wrapper"><button class="live-index-btn" onclick="revokeLiveReport('${report.id}')">REVOKE APPROVAL</button></div>`;
+
+        segment += `
+        <div class="live-index-card">
+          <div class="top-line" style="background: ${cVar};"></div>
+          <div class="corner-box"></div>
+          <div class="live-index-card-header">
+            <div class="live-index-card-title" style="color: ${cVar};">REPORT_${dispId}.log</div>
+            <div class="live-index-card-year">2025.txt</div>
+          </div>
+          <div class="live-index-card-from">FROM: ${report.role||'USER'} @ ${report.organization||'UNKNOWN'}</div>
+          <p class="live-index-card-msg">"${report.message}"</p>
+          <div class="live-index-card-stars" style="color: ${cVar}; opacity: 0.7;">
+            ${stars}
+          </div>
+          ${revokeBtn}
+        </div>`;
+      });
+
+      // repeat segments; ensure ample width for wrap
+      container.innerHTML = segment + segment + segment;
+      let repeats = 3;
+      const sliderWidth = slider ? slider.clientWidth : 0;
+      if (sliderWidth > 0) {
+        while (container.scrollWidth < sliderWidth * 3 && repeats < 12) {
+          container.innerHTML += segment;
+          repeats += 1;
+        }
+      }
+      container.dataset.repeatCount = String(repeats);
+
+      // start at middle copy for bidirectional drag
+      if (slider && repeats > 0) {
+        const seg = container.scrollWidth / repeats;
+        if (seg > 0) {
+          const midIndex = Math.floor(repeats / 2);
+          slider.scrollLeft = seg * midIndex;
+        }
+      }
+      }
+
+    async function revokeLiveReport(id) {
+      try {
+        const existing = allReports.find(r => r.id === id);
+        if (existing) {
+          await updateDoc(doc(db, "reports", id), { status: "rejected" });
+        } else {
+          const demo = baseLiveData.find(item => item.id === id);
+          if (!demo) return;
+
+          await addDoc(collection(db, "reports"), {
+            name: demo.name || "Anonymous",
+            role: demo.role || "User",
+            organization: demo.organization || "Unknown",
+            message: demo.message,
+            rating: demo.rating || 5,
+            status: "rejected",
+            sourceId: demo.id,
+            createdAt: Timestamp.now()
+          });
+        }
+
+        await fetchReports();
+      } catch (error) {
+        console.error(error);
+        alert("Action failed! Missing Firestore Permissions.");
+      }
+    }
+
+    // expose admin helpers for console/manual use
+    window.revokeLiveReport = revokeLiveReport;
+    window.replaceReportsWithSeed = replaceReportsWithSeed;
+    // expose for inline buttons
+    window.revokeLiveReport = revokeLiveReport;
+
+      function renderDictionary() {
+      const grid = document.getElementById('dictionary-grid');
+      const controls = document.getElementById('pagination-controls');
+      const dictionaryReports = allReports.filter(r => r.status !== 'approved');
+      
+      grid.innerHTML = '';
+      controls.innerHTML = '';
+
+      if (dictionaryReports.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><p>DICTIONARY IS EMPTY.</p></div>`;
+        return;
+      }
+
+      const totalPages = Math.ceil(dictionaryReports.length / itemsPerPage);
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const paginated = dictionaryReports.slice(start, start + itemsPerPage);
+
+      paginated.forEach((report, i) => {
+        grid.innerHTML += createCardHTML(report, start + i, 'standard');
+      });
+
+      // Pagination UI
+      if (totalPages > 1) {
+          for (let p = 1; p <= totalPages; p++) {
+              const btn = document.createElement('button');
+              btn.className = 'page-btn ' + (p === currentPage ? 'active' : '');
+              btn.innerText = p;
+              btn.onclick = () => {
+                  currentPage = p;
+                  renderDictionary();
+                  document.getElementById('dictionary-grid').scrollIntoView({behavior: 'smooth', block: 'start'});
+              };
+              controls.appendChild(btn);
+          }
+      }
+    }
+
+    window.handleAction = async (id, actionType) => {
+      // Find card element visually if standard card
+      const c = document.getElementById('card-' + id);
+      if(c) c.style.opacity = '0.5';
+
+      try {
+        await updateDoc(doc(db, "reports", id), { status: actionType === 'approve' ? "approved" : "rejected" });
+        // After db completes, hard refresh the logic state
+        await fetchReports();
+      } catch (error) {
+        console.error(error);
+        alert("Action failed! Missing Firestore Permissions.");  
+        if(c) c.style.opacity = '1';
+      }
+    };
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
