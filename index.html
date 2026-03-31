@@ -1810,20 +1810,64 @@
                         createdAt: serverTimestamp()
                     });
 
-                    alert("Boom! 🚀 Your review was sent perfectly. I'll take a look soon!");
+                    showBrutalistToast('success', 'Data transmitted successfully. Thank you for your review.');
                     form.reset();
                     // If the profile details block is open, might want to close it or keep it as is.
                     // Assuming chips might need clearing, form.reset() handles inputs.
                 } catch (error) {
                     console.error("Error adding document: ", error);
-                    alert("Oh no! Something went wrong submitting your review. Please try again.");
+                    showBrutalistToast('error', 'Connection to server rejected. Please try again.');
                 } finally {
                     submitBtn.innerHTML = originalBtnText;
                     submitBtn.disabled = false;
                 }
             });
         }
+
+        // Brutalist Toast Functions
+        window.showBrutalistToast = function(type, message) {
+            const toast = document.getElementById('brutalist-toast');
+            const title = document.getElementById('toast-title');
+            const id = document.getElementById('toast-id');
+            const msg = document.getElementById('toast-message');
+            const inner = document.getElementById('toast-inner');
+
+            if(type === 'success') {
+                title.innerText = 'ACKNOWLEDGED.';
+                title.className = 'font-mono text-xl font-bold uppercase mb-2';
+                id.innerText = 'RECEIPT_ID: TX-' + Math.floor(Math.random() * 90000 + 10000);
+                inner.style.boxShadow = '6px 6px 0 #FBFF48, 12px 12px 0 #121212';
+            } else {
+                title.innerText = 'TRANSMISSION FAILED.';
+                title.className = 'font-mono text-xl font-bold uppercase mb-2 text-neo-red';
+                id.innerText = 'ERR_CODE: 0x' + Math.floor(Math.random() * 9000 + 1000).toString(16).toUpperCase();
+                inner.style.boxShadow = '6px 6px 0 #FF2A2A, 12px 12px 0 #121212';
+            }
+            msg.innerText = message;
+            
+            toast.classList.remove('translate-y-[150%]', 'opacity-0');
+            
+            if(toast.timeoutId) clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(window.closeBrutalistToast, 5000);
+        }
+
+        window.closeBrutalistToast = function() {
+            const toast = document.getElementById('brutalist-toast');
+            toast.classList.add('translate-y-[150%]', 'opacity-0');
+        }
+        
+        document.getElementById('toast-close')?.addEventListener('click', window.closeBrutalistToast);
     </script>
+
+    <!-- Global Brutalist Toast Container -->
+    <div id="brutalist-toast" class="fixed bottom-6 right-6 z-50 transition-all duration-500 transform translate-y-[150%] opacity-0">
+        <div id="toast-inner" class="w-[380px] sm:w-[420px] bg-white text-neo-black border-4 border-dashed border-neo-black p-6 relative transition-all duration-300" style="box-shadow: 6px 6px 0 #FBFF48, 12px 12px 0 #121212;">
+            <button id="toast-close" class="absolute top-2 right-4 font-mono font-bold text-3xl hover:text-neo-red transition-colors">&times;</button>
+            <div id="toast-title" class="font-mono text-xl font-bold uppercase mb-2">ACKNOWLEDGED.</div>
+            <div id="toast-id" class="font-mono text-sm font-bold text-gray-600 mb-4 border-b-2 border-dashed border-gray-400 pb-2">RECEIPT_ID: TX-84920</div>
+            <div id="toast-message" class="text-lg leading-snug font-bold font-sans">The database has received your review. Expect processing shortly.</div>
+        </div>
+    </div>
 </body>
 
 
