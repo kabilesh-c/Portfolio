@@ -625,9 +625,6 @@
     .live-index-btn { margin: 0; background: var(--card-bg); width: 100%; }
 
     .delete-icon {
-      position: absolute;
-      top: 12px;
-      right: 12px;
       width: 28px;
       height: 28px;
       background: var(--bg-dark);
@@ -641,6 +638,7 @@
       transition: all 0.2s ease;
       z-index: 10;
       border-radius: 4px;
+      flex-shrink: 0;
     }
     .report-card:hover .delete-icon {
       opacity: 1;
@@ -1108,16 +1106,18 @@
 
         return `
           <div class="report-card" id="card-${report.id}">
-            <button class="delete-icon" onclick="deleteReport('${report.id}')" title="Permanently Delete">
-              <svg viewBox="0 0 24 24">
-                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-              </svg>
-            </button>
             <div class="card-top-line" style="border-color: ${c}"></div>
             <div class="card-inner">
-              <div class="card-header">
+              <div class="card-header" style="align-items: center;">
                 <span class="file-name" style="color: ${c}">REPORT_${report.id.substring(0,6)}.LOG</span>
-                <span class="file-size" style="color: ${report.status === 'approved' ? 'var(--accent-green)' : report.status === 'rejected' ? 'var(--accent-red)' : '#666'}">[${report.status.toUpperCase()}]</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="file-size" style="color: ${report.status === 'approved' ? 'var(--accent-green)' : report.status === 'rejected' ? 'var(--accent-red)' : '#666'}">[${report.status.toUpperCase()}]</span>
+                  <button class="delete-icon" onclick="deleteReport('${report.id}')" title="Permanently Delete">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div class="card-meta">
                 ${orgHtml ? `<span class="meta-label">FROM:</span> ${orgHtml}` : ''}
