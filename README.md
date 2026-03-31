@@ -43,7 +43,6 @@ No unnecessary frameworks for core pages. Just fast delivery, clean structure, a
 
 - **index.html** — Public portfolio, live reports marquee, achievements conveyors, skills motion rows, contact CTA.
 - **admin.html** — Mission Control for live reports (Firestore-backed): approve/revoke, seed helpers, live marquee preview.
-- **admin-sample** files — Legacy experiments; not required for prod.
 
 ## LIVE DATA + MARQUEES
 
@@ -96,8 +95,6 @@ No unnecessary frameworks for core pages. Just fast delivery, clean structure, a
 │   └── Resume/
 ├── index.html          # public portfolio
 ├── admin.html          # mission-control (live reports admin)
-├── admin-sample*.html  # legacy experiment pages (not for prod)
-├── preview-*.html      # preview concepts
 └── README.md
 ```
 
