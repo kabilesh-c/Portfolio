@@ -1726,18 +1726,18 @@
 
         if (reportsSlider && reportsMarquee) {
             // pause only when hovering an actual card; add slight delay to reduce accidental brushes
-            reportsSlider.addEventListener('pointerenter', (e) => {
+            reportsSlider.addEventListener('mouseover', (e) => {
                 if (e.target.closest('.live-feed-card')) {
                     clearTimeout(reportsHoverTimer);
                     reportsHoverTimer = setTimeout(pauseReports, 150);
                 }
-            }, true);
-            reportsSlider.addEventListener('pointerleave', (e) => {
+            });
+            reportsSlider.addEventListener('mouseout', (e) => {
                 if (e.target.closest('.live-feed-card')) {
                     clearTimeout(reportsHoverTimer);
                     reportsHoverTimer = setTimeout(resumeReports, 80);
                 }
-            }, true);
+            });
 
             reportsSlider.addEventListener('mousedown', (e) => {
                 reportsIsDown = true;
@@ -1760,17 +1760,6 @@
                 const walk = (x - reportsStartX) * 2;
                 reportsSlider.scrollLeft = reportsScrollLeft - walk;
             });
-
-            reportsSlider.addEventListener('wheel', (e) => {
-                const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-                if (delta !== 0) {
-                    e.preventDefault();
-                    reportsSlider.scrollLeft += delta;
-                    pauseReports();
-                    clearTimeout(reportsSlider.__wheelTimer);
-                    reportsSlider.__wheelTimer = setTimeout(resumeReports, 350);
-                }
-            }, { passive: false });
 
             // seamless wrap so dragging feels circular
             reportsSlider.addEventListener('scroll', () => {

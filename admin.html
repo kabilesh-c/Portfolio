@@ -897,18 +897,18 @@
     if (slider) {
       let hoverTimer;
       // pause only when hovering a card; add small delay to avoid accidental pauses
-      slider.addEventListener('pointerenter', (e) => {
+      slider.addEventListener('mouseover', (e) => {
         if (e.target.closest('.live-index-card')) {
           clearTimeout(hoverTimer);
           hoverTimer = setTimeout(pauseMarquee, 150);
         }
-      }, true);
-      slider.addEventListener('pointerleave', (e) => {
+      });
+      slider.addEventListener('mouseout', (e) => {
         if (e.target.closest('.live-index-card')) {
           clearTimeout(hoverTimer);
           hoverTimer = setTimeout(resumeMarquee, 80);
         }
-      }, true);
+      });
       slider.addEventListener('mousedown', (e) => {
         isDown = true;
         slider.style.cursor = 'grabbing';
@@ -928,16 +928,6 @@
         const walk = (x - startX) * 2;
         slider.scrollLeft = scrollLeft - walk;
       });
-      slider.addEventListener('wheel', (e) => {
-        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-        if (delta !== 0) {
-          e.preventDefault();
-          slider.scrollLeft += delta;
-          pauseMarquee();
-          clearTimeout(slider.__wheelTimer);
-          slider.__wheelTimer = setTimeout(resumeMarquee, 350);
-        }
-      }, { passive: false });
 
       // seamless wrap so dragging feels circular
       slider.addEventListener('scroll', () => {
