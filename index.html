@@ -256,6 +256,106 @@
             transform: rotate(180deg);
         }
 
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            /* Tech stack: simple 2-column grid per section, no movement, with labels shown */
+            #skills .conveyor-row {
+                overflow: visible;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            .conveyor-left,
+            .conveyor-right,
+            .conveyor-left-slow,
+            .conveyor-right-slow {
+                animation: none;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                width: 100%;
+            }
+            .skill-box {
+                width: 100%;
+                max-width: none;
+                min-width: 0;
+                padding: 12px 14px;
+                font-size: 0.95rem;
+                border-width: 2px !important;
+                box-shadow: 4px 4px 0 #000;
+            }
+            /* Show sidebar labels on mobile, but shrink to keep text inside */
+            #skills .hidden.md\:flex {
+                display: flex !important;
+                width: 48px;
+            }
+            #skills .category-label {
+                writing-mode: vertical-rl;
+                transform: rotate(180deg);
+                font-size: 9px;
+                line-height: 1;
+                padding: 4px 0;
+                text-align: center;
+                white-space: normal;
+                word-break: break-word;
+            }
+            /* Hide duplicates per lane to keep unique set */
+            #skills .row-lang .skill-box:nth-child(n+9) { display: none; }
+            #skills .row-fw .skill-box:nth-child(n+9) { display: none; }
+            #skills .row-devops .skill-box:nth-child(n+12) { display: none; }
+            #skills .row-aiml .skill-box:nth-child(n+11) { display: none; }
+
+            /* Achievements: keep cards fully visible and contained */
+            #achievements .conveyor-row {
+                overflow-x: auto;
+            }
+            #achievements .conveyor-row .flex {
+                flex-wrap: nowrap;
+            }
+            #achievements .achievement-card {
+                width: min(88vw, 320px);
+            }
+            #achievements .achievement-card img {
+                height: 180px;
+                object-fit: cover;
+            }
+            #achievements .max-w-7xl {
+                max-width: 100%;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            #achievements .border-y-4,
+            #achievements .border-4 {
+                border-width: 2px;
+            }
+
+            /* Reports: shrink cards, prevent overlap, and keep auto-scroll usable */
+            #reports .marquee-container {
+                overflow-x: auto;
+                scroll-snap-type: none;
+                padding-left: 14px;
+                padding-right: 14px;
+                scroll-behavior: auto;
+                -webkit-overflow-scrolling: touch;
+                touch-action: pan-x;
+            }
+            #index-reports-marquee {
+                gap: 16px;
+                width: max-content;
+            }
+            #index-reports-marquee .live-feed-segment {
+                gap: 16px !important;
+            }
+            /* Target both static and live-injected report cards */
+            #index-reports-marquee > div,
+            #index-reports-marquee .live-feed-card {
+                width: min(82vw, 290px) !important;
+                min-height: 260px;
+                padding: 20px 18px;
+                scroll-snap-align: start;
+                flex: 0 0 auto;
+            }
+        }
+
         .chip.active {
             background: #FBFF48;
             color: #121212;
@@ -442,7 +542,7 @@
                 <div class="hidden md:flex flex-shrink-0 w-16 bg-neo-green border-r-4 border-black items-center justify-center z-20 relative">
                     <span class="category-label font-mono font-black text-black text-xs tracking-widest uppercase">LANGUAGES</span>
                 </div>
-                <div class="conveyor-row overflow-hidden flex-1 border-y-2 border-white/10 bg-black/30 py-3">
+                <div class="conveyor-row row-lang overflow-hidden flex-1 border-y-2 border-white/10 bg-black/30 py-3">
                     <div class="conveyor-right">
                         <div class="skill-box flex-shrink-0 mx-2 px-6 py-4 bg-neo-black border-neo-green text-neo-green font-black text-lg uppercase font-display tracking-wider hover:bg-neo-green hover:text-black cursor-hover" style="border-width:3px"><span class="font-mono text-[10px] block opacity-50 mb-1">>_</span>JAVASCRIPT</div>
                         <div class="skill-box flex-shrink-0 mx-2 px-6 py-4 bg-neo-black border-neo-green text-neo-green font-black text-lg uppercase font-display tracking-wider hover:bg-neo-green hover:text-black cursor-hover" style="border-width:3px"><span class="font-mono text-[10px] block opacity-50 mb-1">>_</span>PYTHON</div>
@@ -472,7 +572,7 @@
                 <div class="hidden md:flex flex-shrink-0 w-16 bg-neo-yellow border-r-4 border-black items-center justify-center z-20 relative">
                     <span class="category-label font-mono font-black text-black text-xs tracking-widest uppercase">FRAMEWORKS</span>
                 </div>
-                <div class="conveyor-row overflow-hidden flex-1 border-y-2 border-white/10 bg-black/20 py-3">
+                <div class="conveyor-row row-fw overflow-hidden flex-1 border-y-2 border-white/10 bg-black/20 py-3">
                     <div class="conveyor-left">
                         <div class="skill-box flex-shrink-0 mx-2 px-6 py-4 bg-neo-black border-neo-yellow text-neo-yellow font-black text-lg uppercase font-display tracking-wider hover:bg-neo-yellow hover:text-black cursor-hover" style="border-width:3px"><span class="font-mono text-[10px] block opacity-50 mb-1">>_</span>REACT</div>
                         <div class="skill-box flex-shrink-0 mx-2 px-6 py-4 bg-neo-black border-neo-yellow text-neo-yellow font-black text-lg uppercase font-display tracking-wider hover:bg-neo-yellow hover:text-black cursor-hover" style="border-width:3px"><span class="font-mono text-[10px] block opacity-50 mb-1">>_</span>NEXT.JS</div>
@@ -504,7 +604,7 @@
                 <div class="hidden md:flex flex-shrink-0 w-16 bg-neo-pink border-r-4 border-black items-center justify-center z-20 relative">
                     <span class="category-label font-mono font-black text-black text-xs tracking-widest uppercase">DEVOPS</span>
                 </div>
-                <div class="conveyor-row overflow-hidden flex-1 border-y-2 border-white/10 bg-black/30 py-3">
+                <div class="conveyor-row row-devops overflow-hidden flex-1 border-y-2 border-white/10 bg-black/30 py-3">
                     <div class="conveyor-right-slow">
                         <div class="skill-box flex-shrink-0 mx-2 px-6 py-4 bg-neo-black border-neo-pink text-neo-pink font-black text-lg uppercase font-display tracking-wider hover:bg-neo-pink hover:text-black cursor-hover" style="border-width:3px"><span class="font-mono text-[10px] block opacity-50 mb-1">>_</span>DOCKER</div>
                         <div class="skill-box flex-shrink-0 mx-2 px-6 py-4 bg-neo-black border-neo-pink text-neo-pink font-black text-lg uppercase font-display tracking-wider hover:bg-neo-pink hover:text-black cursor-hover" style="border-width:3px"><span class="font-mono text-[10px] block opacity-50 mb-1">>_</span>AWS</div>
@@ -542,7 +642,7 @@
                 <div class="hidden md:flex flex-shrink-0 w-16 bg-neo-purple border-r-4 border-black items-center justify-center z-20 relative">
                     <span class="category-label font-mono font-black text-white text-xs tracking-widest uppercase">AI / ML</span>
                 </div>
-                <div class="conveyor-row overflow-hidden flex-1 border-y-2 border-white/10 bg-black/20 py-3">
+                <div class="conveyor-row row-aiml overflow-hidden flex-1 border-y-2 border-white/10 bg-black/20 py-3">
                     <div class="conveyor-left-slow">
                         <div class="skill-box flex-shrink-0 mx-2 px-6 py-4 bg-neo-black border-neo-purple text-neo-purple font-black text-lg uppercase font-display tracking-wider hover:bg-neo-purple hover:text-black cursor-hover" style="border-width:3px"><span class="font-mono text-[10px] block opacity-50 mb-1">>_</span>TENSORFLOW</div>
                         <div class="skill-box flex-shrink-0 mx-2 px-6 py-4 bg-neo-black border-neo-purple text-neo-purple font-black text-lg uppercase font-display tracking-wider hover:bg-neo-purple hover:text-black cursor-hover" style="border-width:3px"><span class="font-mono text-[10px] block opacity-50 mb-1">>_</span>OPENCV</div>
@@ -1665,8 +1765,12 @@
                 }
                 // set starting offset
                 if (reportsSlider && reportsMarquee.firstElementChild) {
-                    const segWidth = reportsMarquee.firstElementChild.offsetWidth + 32; // 32 is gap-8
-                    if (segWidth > 32) reportsSlider.scrollLeft = segWidth;
+                    const style = getComputedStyle(marquee);
+                    const gapStr = style.columnGap || style.gap || '32';
+                    const gapVal = parseInt(gapStr, 10);
+                    const gap = Number.isNaN(gapVal) ? 32 : gapVal;
+                    const segWidth = reportsMarquee.firstElementChild.offsetWidth + gap;
+                    if (segWidth > gap) reportsSlider.scrollLeft = segWidth;
                 }
             } catch (error) {
                 console.error("Failed to load reports", error);
@@ -1683,9 +1787,19 @@
         let reportsScrollLeft;
         let reportsHoverTimer;
         let isReportsAutoPaused = false;
+        const getReportsGap = () => {
+            if (!reportsMarquee) return 32;
+            const style = getComputedStyle(reportsMarquee);
+            const gapStr = style.columnGap || style.gap || '32';
+            const gapVal = parseInt(gapStr, 10);
+            return Number.isNaN(gapVal) ? 32 : gapVal;
+        };
 
         const pauseReports = () => { isReportsAutoPaused = true; };
         const resumeReports = () => { isReportsAutoPaused = false; };
+        const resumeReportsSoon = (delay = 250) => { setTimeout(resumeReports, delay); };
+        // Safety: if a pause flag sticks on mobile, unpause periodically when not dragging
+        setInterval(() => { if (!reportsIsDown) isReportsAutoPaused = false; }, 1800);
 
         // Continuous seamless auto-scroll
         function runReportsAutoScroll() {
@@ -1696,10 +1810,29 @@
         }
         runReportsAutoScroll();
 
+        // Auto-drift skills on mobile (bounce left-right without duplicates)
+        if (window.matchMedia('(max-width: 768px)').matches) {
+            const skillRows = document.querySelectorAll('#skills .conveyor-row');
+            skillRows.forEach((row) => {
+                let dir = 1;
+                const step = 0.7;
+                const drift = () => {
+                    if (!document.body.contains(row)) return;
+                    const max = row.scrollWidth - row.clientWidth;
+                    if (max <= 4) return; // no overflow, nothing to drift
+                    if (row.scrollLeft >= max - 2) dir = -1;
+                    else if (row.scrollLeft <= 2) dir = 1;
+                    row.scrollLeft += dir * step;
+                    requestAnimationFrame(drift);
+                };
+                drift();
+            });
+        }
+
         const resetReportsLoopPosition = () => {
             if (!reportsSlider || !reportsMarquee || !reportsMarquee.firstElementChild) return;
-            const seg = reportsMarquee.firstElementChild.offsetWidth + 32;
-            if (seg > 32) reportsSlider.scrollLeft = seg; // keep pointer in middle copy
+            const seg = reportsMarquee.firstElementChild.offsetWidth + getReportsGap();
+            if (seg > getReportsGap()) reportsSlider.scrollLeft = seg; // keep pointer in middle copy
         };
 
         if (reportsSlider && reportsMarquee) {
@@ -1728,7 +1861,37 @@
             reportsSlider.addEventListener('mouseup', () => {
                 reportsIsDown = false;
                 reportsSlider.style.cursor = 'auto';
-                resumeReports();
+                resumeReportsSoon();
+            });
+
+            reportsSlider.addEventListener('mouseleave', () => {
+                reportsIsDown = false;
+                reportsSlider.style.cursor = 'auto';
+                resumeReportsSoon();
+            });
+
+            // Touch support to ensure auto-scroll resumes on mobile
+            reportsSlider.addEventListener('touchstart', () => {
+                reportsIsDown = true;
+                if (event.touches && event.touches[0]) {
+                    reportsStartX = event.touches[0].pageX - reportsSlider.offsetLeft;
+                    reportsScrollLeft = reportsSlider.scrollLeft;
+                }
+                pauseReports();
+            });
+            reportsSlider.addEventListener('touchmove', (event) => {
+                if (!reportsIsDown || !event.touches || !event.touches[0]) return;
+                const x = event.touches[0].pageX - reportsSlider.offsetLeft;
+                const walk = (x - reportsStartX) * 1.4;
+                reportsSlider.scrollLeft = reportsScrollLeft - walk;
+            });
+            reportsSlider.addEventListener('touchend', () => {
+                reportsIsDown = false;
+                resumeReportsSoon(200);
+            });
+            reportsSlider.addEventListener('touchcancel', () => {
+                reportsIsDown = false;
+                resumeReportsSoon(200);
             });
 
             reportsSlider.addEventListener('mousemove', (e) => {
@@ -1743,8 +1906,8 @@
             reportsSlider.addEventListener('scroll', () => {
                 if (!reportsMarquee.firstElementChild) return;
                 const count = parseInt(reportsMarquee.dataset.repeatCount || '0', 10);
-                const seg = reportsMarquee.firstElementChild.offsetWidth + 32; // width of one segment including gap
-                if (seg <= 32 || count < 3) return;
+                const seg = reportsMarquee.firstElementChild.offsetWidth + getReportsGap();
+                if (seg <= getReportsGap() || count < 3) return;
 
                 const left = reportsSlider.scrollLeft;
                 const min = seg;                 // start of middle band
