@@ -336,7 +336,8 @@
                 padding-right: 14px;
                 scroll-behavior: auto;
                 -webkit-overflow-scrolling: touch;
-                touch-action: pan-x;
+                touch-action: auto;
+                overscroll-behavior-x: contain;
             }
             #index-reports-marquee {
                 gap: 16px;
@@ -1723,9 +1724,18 @@
                 const snapshot = await getDocs(q);
                 let approved = [];
                 snapshot.forEach(doc => approved.push({id: doc.id, ...doc.data()}));
+
+                // Deduplicate by id and message
+                const seen = new Set();
+                approved = approved.filter(r => {
+                    const key = `${r.id}::${r.message || ''}`;
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                });
                 
                 if (approved.length === 0) {
-                    return; // keep existing static items as fallback
+                    return; // keep existing static items as fallback when none live
                 }
                 
                 let segment = '';
