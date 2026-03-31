@@ -624,6 +624,38 @@
     }
     .live-index-btn { margin: 0; background: var(--card-bg); width: 100%; }
 
+    .delete-icon {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      background: var(--bg-dark);
+      color: var(--accent-red);
+      border: 2px solid var(--accent-red);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.2s ease;
+      z-index: 10;
+      border-radius: 4px;
+    }
+    .report-card:hover .delete-icon {
+      opacity: 1;
+    }
+    .delete-icon:hover {
+      background: var(--accent-red);
+      color: white;
+      transform: scale(1.1);
+    }
+    .delete-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
     /* Scroll reveal */
     .reveal-on-scroll { opacity: 0; transform: translateY(24px); transition: all 0.6s ease; }
     .reveal-on-scroll.visible { opacity: 1; transform: translateY(0); }
@@ -1076,6 +1108,11 @@
 
         return `
           <div class="report-card" id="card-${report.id}">
+            <button class="delete-icon" onclick="deleteReport('${report.id}')" title="Permanently Delete">
+              <svg viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+            </button>
             <div class="card-top-line" style="border-color: ${c}"></div>
             <div class="card-inner">
               <div class="card-header">
@@ -1243,6 +1280,23 @@
           }
       }
     }
+
+    window.deleteReport = async (id) => {
+      const confirmDelete = confirm("Are you sure you want to permanently delete this report?");
+      if (!confirmDelete) return;
+
+      const c = document.getElementById('card-' + id);
+      if(c) c.style.opacity = '0.3';
+
+      try {
+        await deleteDoc(doc(db, "reports", id));
+        await fetchReports();
+      } catch (error) {
+        console.error("Error deleting report:", error);
+        alert("Delete failed! Missing Firestore Permissions.");  
+        if(c) c.style.opacity = '1';
+      }
+    };
 
     window.handleAction = async (id, actionType) => {
       // Find card element visually if standard card
